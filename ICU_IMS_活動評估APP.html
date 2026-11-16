@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="IMS評估">
+<title>ICU 早期活動 IMS 評估</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231a6fc4'/><rect x='8' y='42' width='48' height='6' rx='2' fill='%23ffffff' opacity='0.35'/><rect x='8' y='46' width='4' height='8' rx='1' fill='%23ffffff' opacity='0.35'/><rect x='52' y='46' width='4' height='8' rx='1' fill='%23ffffff' opacity='0.35'/><circle cx='36' cy='16' r='6' fill='%23ffffff'/><line x1='32' y1='42' x2='36' y2='22' stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round'/><line x1='32' y1='42' x2='16' y2='42' stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round'/><line x1='35' y1='28' x2='46' y2='36' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%231a6fc4'/><rect x='22' y='118' width='136' height='17' rx='5' fill='%23ffffff' opacity='0.35'/><rect x='22' y='130' width='11' height='22' rx='3' fill='%23ffffff' opacity='0.35'/><rect x='147' y='130' width='11' height='22' rx='3' fill='%23ffffff' opacity='0.35'/><circle cx='102' cy='44' r='17' fill='%23ffffff'/><line x1='90' y1='118' x2='102' y2='62' stroke='%23ffffff' stroke-width='13' stroke-linecap='round'/><line x1='90' y1='118' x2='44' y2='118' stroke='%23ffffff' stroke-width='13' stroke-linecap='round'/><line x1='100' y1='80' x2='130' y2='102' stroke='%23ffffff' stroke-width='10' stroke-linecap='round'/></svg>">
+<style>
+:root {
+  --bg:#f7f6f3; --surface:#fff; --surface2:#f0eeea;
+  --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.18);
+  --text:#1a1a18; --text2:#5a5a56; --text3:#9a9990;
+  --blue:#1a6fc4; --blue-bg:#e8f1fb; --blue-text:#0f4a8a;
+  --red:#c42020; --red-bg:#fceaea; --red-text:#8a1010;
+  --orange:#c46010; --orange-bg:#fef0e0; --orange-text:#7a3c08;
+  --green:#1a8a4a; --green-bg:#e6f5ec; --green-text:#0f5a2e;
+  --r:10px; --rl:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a18; --surface:#252522; --surface2:#2e2e2a;
+    --border:rgba(255,255,255,0.10); --border2:rgba(255,255,255,0.18);
+    --text:#e8e6e0; --text2:#a8a49c; --text3:#686460;
+    --blue:#5a9fe0; --blue-bg:#0f2a4a; --blue-text:#8ac4f8;
+    --red:#e06060; --red-bg:#3a1010; --red-text:#f09090;
+    --orange:#e09050; --orange-bg:#3a2010; --orange-text:#f0b880;
+    --green:#50c080; --green-bg:#0f2a1a; --green-text:#80e0a8;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text);font-size:15px}
+body{display:flex;flex-direction:column}
+
+/* NAV */
+.nav{background:var(--surface);border-bottom:.5px solid var(--border);display:flex;position:sticky;top:0;z-index:100}
+.nt{flex:1;padding:13px 4px 11px;text-align:center;color:var(--text3);border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s}
+.nt.active{color:var(--blue)}
+.nt svg{width:22px;height:22px}
+.nt span{font-size:10px}
+
+/* PAGES */
+.page{display:none;flex:1;overflow-y:auto;padding:16px}
+.page.active{display:block}
+
+/* PROGRESS */
+.prog{display:flex;gap:4px;margin-bottom:18px}
+.ps{height:3px;flex:1;border-radius:2px;background:var(--border2);transition:background .3s}
+.ps.done{background:var(--blue)}
+.ps.cur{background:var(--text3)}
+
+/* STEPS */
+.step{display:none}
+.step.active{display:block}
+.badge{display:inline-block;font-size:11px;font-weight:600;background:var(--blue-bg);color:var(--blue-text);padding:3px 10px;border-radius:20px;margin-bottom:6px}
+.stitle{font-size:17px;font-weight:600;line-height:1.3;margin-bottom:4px}
+.ssub{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5}
+.slabel{font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--text3);margin-bottom:8px;text-transform:uppercase}
+
+/* OPTIONS */
+.olist{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.oi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.oi:active{background:var(--surface2)}
+.oi.sel{border-color:var(--blue);background:var(--blue-bg)}
+.oi.chk{border-color:var(--blue);background:var(--blue-bg)}
+.oradio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.oi.sel .oradio{border-color:var(--blue);background:var(--blue)}
+.oi.sel .oradio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;display:block}
+.ochk{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.oi.chk .ochk{border-color:var(--blue);background:var(--blue)}
+.oi.chk .ochk::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+.olabel{flex:1}
+.otitle{font-size:14px;font-weight:500;line-height:1.4}
+.odesc{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.4}
+
+/* BUTTONS */
+.brow{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;padding:13px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:15px;font-weight:500;cursor:pointer;text-align:center}
+.btn:active{background:var(--surface2)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.p:active{opacity:.85}
+.btn.d{background:var(--red-bg);border-color:var(--red);color:var(--red-text)}
+.btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+
+.div{border:none;border-top:.5px solid var(--border);margin:14px 0}
+
+/* RESULT */
+.rc{border-radius:var(--rl);padding:16px 18px;margin-bottom:14px;border:1px solid var(--border)}
+.rc.hold{background:var(--red-bg);border-color:var(--red)}
+.rc.passive{background:var(--orange-bg);border-color:var(--orange)}
+.rc.neutral{background:var(--surface2);border-color:var(--border2)}
+.rc.active{background:var(--green-bg);border-color:var(--green)}
+.rtag{font-size:11px;font-weight:600;letter-spacing:.05em;margin-bottom:4px}
+.rc.hold .rtag{color:var(--red-text)}
+.rc.passive .rtag{color:var(--orange-text)}
+.rc.neutral .rtag{color:var(--text2)}
+.rc.active .rtag{color:var(--green-text)}
+.rims{font-size:23px;font-weight:700;margin-bottom:8px;line-height:1.2}
+.rc.hold .rims{color:var(--red)}
+.rc.passive .rims{color:var(--orange)}
+.rc.neutral .rims{color:var(--text)}
+.rc.active .rims{color:var(--green)}
+.rdesc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.rplan{font-size:13px;color:var(--text)}
+.rplan strong{font-weight:600;display:block;margin-bottom:6px}
+.rplan ul{padding-left:16px}
+.rplan ul li{margin-bottom:4px;line-height:1.5}
+.rnote{background:var(--red-bg);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--red-text);margin-top:10px;line-height:1.5}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fl{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block}
+.fi{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:11px 13px;font-size:15px;color:var(--text);font-family:inherit}
+.fi:focus{outline:none;border-color:var(--blue)}
+.fr{display:flex;gap:10px}
+.fr .fg{flex:1}
+
+/* RECORDS */
+.rempty{text-align:center;padding:48px 20px;color:var(--text3)}
+.rempty svg{width:48px;height:48px;opacity:.3;margin:0 auto 12px;display:block}
+.ri{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.rih{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.ripat{font-size:15px;font-weight:600}
+.ritime{font-size:11px;color:var(--text3);margin-top:2px}
+.ribadge{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
+.ribadge.hold{background:var(--red-bg);color:var(--red-text)}
+.ribadge.passive{background:var(--orange-bg);color:var(--orange-text)}
+.ribadge.neutral{background:var(--surface2);color:var(--text2)}
+.ribadge.active{background:var(--green-bg);color:var(--green-text)}
+.rib{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer}
+.rib.del{color:var(--red)}
+.rib:active{background:var(--surface2)}
+
+.ebar{position:sticky;bottom:0;background:var(--bg);border-top:.5px solid var(--border);padding:12px 16px;display:flex;gap:10px}
+.eb{flex:1;padding:13px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;font-weight:500;cursor:pointer;text-align:center}
+.eb.p{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ABOUT */
+.as{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px;margin-bottom:12px}
+.at{font-size:13px;font-weight:600;margin-bottom:8px}
+.ab{font-size:13px;color:var(--text2);line-height:1.7}
+.ct{width:100%;font-size:12px;border-collapse:collapse}
+.ct th{text-align:left;font-weight:600;color:var(--text2);padding:6px 8px;border-bottom:.5px solid var(--border2)}
+.ct td{padding:8px;border-bottom:.5px solid var(--border);vertical-align:top;line-height:1.5}
+.ct tr:last-child td{border-bottom:none}
+
+/* TOAST */
+.src{flex-shrink:0;text-align:center;font-size:11px;color:var(--text3);padding:8px 12px;border-top:.5px solid var(--border);background:var(--surface);line-height:1.5}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s,transform .3s;z-index:200;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+<!-- 統計服務（選用，擇一，部署時取消註解並填入你的帳號）
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+</head>
+<body>
+
+<nav class="nav">
+  <button class="nt active" onclick="showPage('assess')" id="nav-assess">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>
+    <span>評估</span>
+  </button>
+  <button class="nt" onclick="showPage('records')" id="nav-records">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M8 7V5"/><path d="M16 7V5"/><path d="M3 11h18"/></svg>
+    <span>紀錄</span>
+  </button>
+  <button class="nt" onclick="showPage('about')" id="nav-about">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>說明</span>
+  </button>
+</nav>
+
+<!-- ===== ASSESS PAGE ===== -->
+<main class="page active" id="page-assess">
+
+  <div id="patient-form">
+    <div style="margin-bottom:16px">
+      <div class="badge">新增評估</div>
+      <div class="stitle" style="margin-top:6px">病患資料</div>
+    </div>
+    <div class="fr">
+      <div class="fg">
+        <label class="fl">病歷號（選填）</label>
+        <input class="fi" id="f-mrn" placeholder="例：A123456" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label class="fl">床號（選填）</label>
+        <input class="fi" id="f-bed" placeholder="請輸入床號" autocomplete="off">
+      </div>
+    </div>
+    <div class="ab" style="font-size:12px;color:var(--text3);margin-top:-4px">病歷號與床號為非必填，僅在需要儲存評估紀錄時填寫；未填寫仍可完整使用評估功能。</div>
+    <div class="brow">
+      <button class="btn p" onclick="startAssess()">開始評估 →</button>
+    </div>
+  </div>
+
+  <div id="assess-flow" style="display:none">
+    <div class="prog">
+      <div class="ps cur" id="ps0"></div>
+      <div class="ps" id="ps1"></div>
+      <div class="ps" id="ps2"></div>
+      <div class="ps" id="ps3"></div>
+      <div class="ps" id="ps4"></div>
+      <div class="ps" id="ps5"></div>
+    </div>
+
+    <!-- S1: Contraindications -->
+    <div class="step active" id="s1">
+      <div class="badge">步驟 1 / 6</div>
+      <div class="stitle">禁忌症篩查</div>
+      <div class="ssub">任一勾選 → IMS 0 暫停主動活動</div>
+      <div class="olist">
+        <div class="oi" onclick="tc(this,'c','hr')"><div class="ochk"></div><div class="olabel"><div class="otitle">HR &lt;50 或 &gt;130 bpm</div></div></div>
+        <div class="oi" onclick="tc(this,'c','map')"><div class="ochk"></div><div class="olabel"><div class="otitle">MAP &gt;90 或 &lt;60 mmHg，或 SBP &gt;160 mmHg 或 DBP &gt;100 mmHg</div></div></div>
+        <div class="oi" onclick="tc(this,'c','spo2')"><div class="ochk"></div><div class="olabel"><div class="otitle">SpO₂ &lt;95%（COPD &lt;90%）</div></div></div>
+        <div class="oi" onclick="tc(this,'c','rr')"><div class="ochk"></div><div class="olabel"><div class="otitle">RR &gt;35 次/分</div></div></div>
+        <div class="oi" onclick="tc(this,'c','bt')"><div class="ochk"></div><div class="olabel"><div class="otitle">BT &gt;38°C</div></div></div>
+        <div class="oi" onclick="tc(this,'c','inr')"><div class="ochk"></div><div class="olabel"><div class="otitle">INR &gt;3.5</div></div></div>
+        <div class="oi" onclick="tc(this,'c','arr')"><div class="ochk"></div><div class="olabel"><div class="otitle">新發複雜心律不整 &lt;24h</div><div class="odesc">含 AfRVR &gt;120 bpm、VT/Vf、complete AV block</div></div></div>
+        <div class="oi" onclick="tc(this,'c','bleed')"><div class="ochk"></div><div class="olabel"><div class="otitle">持續出血</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn d" id="b1yes" onclick="res('hold','IMS 0 — 暫停治療','存在禁忌症，暫停一切主動活動','<strong>今日活動計劃：</strong><ul><li>被動關節活動（Passive ROM）</li><li>適當身體擺位</li><li>每班重新評估，待禁忌症解除後繼續</li></ul>','')">有禁忌症 → IMS 0</button>
+        <button class="btn p" id="b1no" onclick="go('s2')">無禁忌症 →</button>
+      </div>
+    </div>
+
+    <!-- S2: Devices -->
+    <div class="step" id="s2">
+      <div class="badge">步驟 2 / 6</div>
+      <div class="stitle">周邊管路與呼吸器設定</div>
+      <div class="ssub">任一勾選 → IMS 0–1 被動活動</div>
+      <div class="olist">
+        <div class="oi" onclick="tc(this,'d','ecmo')"><div class="ochk"></div><div class="olabel"><div class="otitle">周邊 ECMO</div></div></div>
+        <div class="oi" onclick="tc(this,'d','crrt')"><div class="ochk"></div><div class="olabel"><div class="otitle">CRRT（連續性腎臟替代療法）</div></div></div>
+        <div class="oi" onclick="tc(this,'d','iabp')"><div class="ochk"></div><div class="olabel"><div class="otitle">IABP（主動脈氣球幫浦）</div></div></div>
+        <div class="oi" onclick="tc(this,'d','rvad')"><div class="ochk"></div><div class="olabel"><div class="otitle">周邊短效型 RVAD（周邊短效型右心室輔助器）</div></div></div>
+        <div class="oi" onclick="tc(this,'d','peep')"><div class="ochk"></div><div class="olabel"><div class="otitle">PEEP &gt;10 cmH₂O</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn" onclick="go('s1')">← 上一步</button>
+        <button class="btn d" id="b2yes" onclick="res('passive','IMS 0–1 — 被動活動','存在特殊管路或呼吸器設定限制','<strong>今日活動計劃：</strong><ul><li>關節活動度訓練（ROM）</li><li>肺部清潔（Lung hygiene）</li><li>適當身體擺位</li></ul>','')">有勾選 → IMS 0–1</button>
+        <button class="btn p" id="b2no" onclick="go('s3')">無以上 →</button>
+      </div>
+    </div>
+
+    <!-- S3: RASS -->
+    <div class="step" id="s3">
+      <div class="badge">步驟 3 / 6</div>
+      <div class="stitle">意識與合作度</div>
+      <div class="ssub">RASS 評分（單選）</div>
+      <div class="olist">
+        <div class="oi" onclick="sr(this,'rass','bad')"><div class="oradio"></div><div class="olabel"><div class="otitle">RASS ≤ -3 或 ≥ +3 或 合作度差</div><div class="odesc">深度鎮靜 / 嚴重躁動 / 無法配合指令</div></div></div>
+        <div class="oi" onclick="sr(this,'rass','ok')"><div class="oradio"></div><div class="olabel"><div class="otitle">RASS -2 至 +2</div><div class="odesc">可喚醒 / 合作尚可</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn" onclick="go('s2')">← 上一步</button>
+        <button class="btn p" onclick="chkRASS()">確認 →</button>
+      </div>
+    </div>
+
+    <!-- S4: Sitting 45 + history -->
+    <div class="step" id="s4">
+      <div class="badge">步驟 4 / 6</div>
+      <div class="stitle">直立坐姿評估</div>
+      <div class="ssub">請選擇最符合目前病患狀況的選項</div>
+      <div class="olist">
+        <div class="oi" onclick="sr(this,'s4choice','ims12')"><div class="oradio"></div><div class="olabel"><div class="otitle">床頭無法抬高 &gt;45° 或 耐受 &lt;10 分鐘 或 肌力 &lt;3</div><div class="odesc">→ IMS 1–2</div></div></div>
+        <div class="oi" onclick="sr(this,'s4choice','ims3')"><div class="oradio"></div><div class="olabel"><div class="otitle">床頭抬高 &gt;45° 耐受 ≥10 分鐘 以及肌力 ≥3</div><div class="odesc">→ IMS 3 開始嘗試</div></div></div>
+        <div class="oi" onclick="sr(this,'s4choice','next')"><div class="oradio"></div><div class="olabel"><div class="otitle">已練習過坐於床緣</div><div class="odesc">→ 進入步驟 5</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn" onclick="go('s3')">← 上一步</button>
+        <button class="btn p" onclick="chkSit45()">確認 →</button>
+      </div>
+    </div>
+
+    <!-- S5: Sit edge -->
+    <div class="step" id="s5">
+      <div class="badge">步驟 5 / 6</div>
+      <div class="stitle">坐床緣評估</div>
+      <div class="ssub">請選擇最符合目前病患狀況的選項</div>
+      <div class="olist">
+        <div class="oi" onclick="sr(this,'s5choice','ims3')"><div class="oradio"></div><div class="olabel"><div class="otitle">坐床緣 &lt;5 分鐘、需中度以上協助，或肌力 &lt;4</div><div class="odesc">→ IMS 3 持續練習</div></div></div>
+        <div class="oi" onclick="sr(this,'s5choice','ims46')"><div class="oradio"></div><div class="olabel"><div class="otitle">輕度協助以下坐床緣 ≥5 分鐘 且肌力 ≥4</div><div class="odesc">→ IMS 4–6</div></div></div>
+        <div class="oi" onclick="sr(this,'s5choice','next')"><div class="oradio"></div><div class="olabel"><div class="otitle">已練習過床邊站立</div><div class="odesc">→ 進入步驟 6</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn" onclick="go('s4')">← 上一步</button>
+        <button class="btn p" onclick="chkSitEdge()">確認 →</button>
+      </div>
+    </div>
+
+    <!-- S6: Stepping + vent -->
+    <div class="step" id="s6">
+      <div class="badge">步驟 6 / 6</div>
+      <div class="stitle">站立及踏步評估</div>
+      <div class="ssub">請先執行 IMS 4–6（坐到站、站姿平衡、原地踏步），血液動力學穩定後再進行踏步測試（≥5 分鐘，接觸保護或輕度協助）</div>
+      <div class="olist">
+        <div class="oi" onclick="sr(this,'s6choice','ims46a')"><div class="oradio"></div><div class="olabel"><div class="otitle">踏步未達 ≥5 分鐘</div><div class="odesc">→ IMS 4–6</div></div></div>
+        <div class="oi" onclick="sr(this,'s6choice','ims46b')"><div class="oradio"></div><div class="olabel"><div class="otitle">踏步 ≥5 分鐘，但管路不可移動</div><div class="odesc">→ IMS 4–6</div></div></div>
+        <div class="oi" onclick="sr(this,'s6choice','ims710')"><div class="oradio"></div><div class="olabel"><div class="otitle">踏步 ≥5 分鐘 且管路可移動</div><div class="odesc">→ IMS 7–10</div></div></div>
+      </div>
+      <div class="brow">
+        <button class="btn" onclick="go('s5')">← 上一步</button>
+        <button class="btn p" onclick="chkStepping()">產生建議 →</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="step" id="sR">
+      <div id="result-area"></div>
+      <div class="brow">
+        <button class="btn" onclick="backToEdit()">← 返回修改</button>
+        <button class="btn" onclick="resetAll()">重新評估</button>
+        <button class="btn p" onclick="saveRecord()">儲存紀錄</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+<!-- ===== RECORDS PAGE ===== -->
+<main class="page" id="page-records">
+  <div id="records-list" style="padding-bottom:72px"></div>
+  <div class="ebar">
+    <button class="eb" onclick="clearAll()">清除全部</button>
+    <button class="eb p" onclick="exportCSV()">匯出 CSV</button>
+  </div>
+</main>
+
+<!-- ===== ABOUT PAGE ===== -->
+<main class="page" id="page-about">
+  <div class="as">
+    <div class="at">關於本工具</div>
+    <div class="ab" style="margin-bottom:8px"><strong>來源聲明：</strong>修改自台大醫院復健部制定心臟外科/胸腔外科加護病房早期活動決策流程。</div>
+    <div class="ab">依據心臟血管外科 / 胸腔外科 ICU 早期活動流程（2024/1/18 版）製作，供護理人員快速確認病患今日 IMS 活動目標。評估紀錄（含病歷號、床號）僅儲存於裝置本機；若啟用使用統計，只會送出「完成一次評估」事件與 IMS 結果類別，不含任何病患資料。</div>
+  </div>
+  <div class="as">
+    <div class="at">停止標準（活動中出現以下情況須立即停止）</div>
+    <table class="ct">
+      <tr><th>項目</th><th>標準</th></tr>
+      <tr><td>心率</td><td>HR &gt;靜止+20 或 &lt;靜止-10 bpm</td></tr>
+      <tr><td>血壓</td><td>ABP &gt;200 mmHg 或下降 &gt;10 mmHg</td></tr>
+      <tr><td>LVAD</td><td>流量 &lt;3.5 L/min</td></tr>
+      <tr><td>血氧</td><td>SpO₂ 下降 &gt;5%</td></tr>
+      <tr><td>呼吸</td><td>RR &gt;40 次/分</td></tr>
+      <tr><td>心律不整</td><td>PVCs &gt;6/min、VT、2°/3° AV block</td></tr>
+      <tr><td>主觀感受</td><td>RPE &gt;14 / Borg &gt;5 / 嚴重疼痛、噁心、頭暈</td></tr>
+    </table>
+  </div>
+  <div class="as">
+    <div class="at">IMS 等級</div>
+    <table class="ct">
+      <tr><th>IMS</th><th>活動內容</th></tr>
+      <tr><td>0</td><td>被動 ROM、肺部清潔、擺位</td></tr>
+      <tr><td>1–2</td><td>肌力訓練、呼吸訓練、床邊腳踏車、床上活動（翻身訓練）</td></tr>
+      <tr><td>3</td><td>坐姿平衡、輕度自理</td></tr>
+      <tr><td>4–6</td><td>坐到站、站姿平衡、原地踏步</td></tr>
+      <tr><td>7–10</td><td>步行耐力訓練（目標心率下）、生活自理訓練</td></tr>
+    </table>
+  </div>
+  <div class="as">
+    <div class="at">使用統計</div>
+    <div class="ab">本機累計完整評估次數：<strong id="usage-local">0</strong> 次（僅計算走完流程並產生結果者）</div>
+  </div>
+  <div class="as">
+    <div class="at">加入主畫面</div>
+    <div class="ab">iOS：Safari → 分享 → 「加入主畫面」<br>Android：Chrome → 右上選單 → 「新增到主畫面」</div>
+  </div>
+</main>
+
+<footer class="src">來源聲明：修改自台大醫院復健部制定心臟外科/胸腔外科加護病房早期活動決策流程</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+var S={endStep:'',basis:[],counted:false,c:[],d:[],rass:'',s4choice:'',s5choice:'',s6choice:'',rtype:'',rlabel:'',rplan:'',mrn:'',bed:''};
+// ===== 使用次數統計設定 =====
+// 完整使用 = 走完評估流程並產生建議結果（每次評估只計一次）。
+// 只送出事件與 IMS 結果類別，不含病歷號、床號等病患資料。
+// 填入你的收集端點（可接 Google Apps Script / 院內伺服器 API）；留空則只計本機次數。
+var COUNTER_URL='';
+var USAGE_KEY='ims_usage_count';
+function countUsage(label){
+  var n=parseInt(localStorage.getItem(USAGE_KEY)||'0',10)+1;
+  try{localStorage.setItem(USAGE_KEY,String(n))}catch(e){}
+  var payload={event:'assessment_complete',result:label,ts:new Date().toISOString()};
+  try{
+    if(COUNTER_URL&&navigator.sendBeacon){
+      navigator.sendBeacon(COUNTER_URL,new Blob([JSON.stringify(payload)],{type:'text/plain'}));
+    }
+    if(window.goatcounter&&window.goatcounter.count){
+      window.goatcounter.count({path:'assessment-complete',title:'完整評估',event:true});
+    }
+    if(typeof window.gtag==='function'){
+      window.gtag('event','ims_assessment_complete',{ims_result:label});
+    }
+  }catch(e){}
+}
+var STEPS=['s1','s2','s3','s4','s5','s6'];
+var STOP='停止標準：HR>靜止+20 或 <靜止-10 bpm・MAP>100 或下降>10 mmHg・SpO₂下降>5%・RR>40/分・LVAD流量<3.5 L/min・PVCs>6/min / VT / 2–3° AV block・RPE>14 / Borg>5 / 嚴重疲勞不適';
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(function(e){e.classList.remove('active')});
+  document.querySelectorAll('.nt').forEach(function(e){e.classList.remove('active')});
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='records')renderRecords();
+  if(p==='about'){var u=document.getElementById('usage-local');if(u)u.textContent=localStorage.getItem(USAGE_KEY)||'0'}
+}
+
+function toast(m){
+  var t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},2000);
+}
+
+function startAssess(){
+  S.mrn=document.getElementById('f-mrn').value.trim()||'未填';
+  S.bed=document.getElementById('f-bed').value.trim()||'未填';
+  document.getElementById('patient-form').style.display='none';
+  document.getElementById('assess-flow').style.display='block';
+  S.counted=false;
+  clearSel();go('s1');
+}
+
+function clearSel(){
+  S.c=[];S.d=[];S.rass='';S.s4choice='';S.s5choice='';S.s6choice='';
+  document.querySelectorAll('.oi').forEach(function(e){e.classList.remove('sel','chk')});
+  updateBtns();
+}
+
+function go(id){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  var i=STEPS.indexOf(id);
+  for(var j=0;j<6;j++){
+    var seg=document.getElementById('ps'+j);
+    if(!seg)return;
+    seg.className='ps';
+    if(j<i)seg.classList.add('done');
+    else if(j===i)seg.classList.add('cur');
+  }
+  window.scrollTo(0,0);
+}
+
+function tc(el,g,v){
+  var arr=g==='c'?S.c:S.d;
+  var i=arr.indexOf(v);
+  if(i>-1){arr.splice(i,1);el.classList.remove('chk')}
+  else{arr.push(v);el.classList.add('chk')}
+  updateBtns();
+}
+
+function updateBtns(){
+  var a=S.c.length>0,b=S.d.length>0;
+  document.getElementById('b1no').disabled=a;
+  document.getElementById('b1yes').disabled=!a;
+  document.getElementById('b2no').disabled=b;
+  document.getElementById('b2yes').disabled=!b;
+}
+
+function toggleHx(el,key){
+  S[key]=!S[key];
+  var chkEl=document.getElementById('chk-'+key);
+  if(S[key]){el.classList.add('chk');if(chkEl)chkEl.classList.add('chk')}
+  else{el.classList.remove('chk');if(chkEl)chkEl.classList.remove('chk')}
+}
+
+function sr(el,k,v){
+  var step=el.closest('.step');
+  step.querySelectorAll('.oi').forEach(function(i){
+    if(i.querySelector('.oradio')&&i!==el)i.classList.remove('sel');
+  });
+  el.classList.add('sel');S[k]=v;
+}
+
+function chkRASS(){
+  if(!S.rass){toast('請選擇 RASS 評分');return}
+  if(S.rass!=='ok'){
+    res('passive','IMS 0–1 — 被動活動','意識或合作度不足',
+      '<strong>今日活動計劃：</strong><ul><li>關節活動度訓練（ROM）</li><li>肺部清潔（Lung hygiene）</li><li>適當身體擺位</li><li>待 RASS 改善至 -2～+2 後重新評估</li></ul>','');
+  }else{go('s4')}
+}
+
+function chkSit45(){
+  if(!S.s4choice){toast('請選擇選項');return}
+  if(S.s4choice==='ims12'){
+    res('neutral','IMS 1–2 — 坐位訓練前期','床頭無法抬高 >45° 或耐受 <10 分鐘 或肌力 <3',
+      '<strong>今日活動計劃（IMS 1–2）：</strong><ul><li>練習床頭搖高</li><li>持續關節活動</li><li>呼吸運動與肌力訓練</li><li>床上活動（翻身訓練）</li><li>床邊腳踏車</li></ul>',STOP);
+    return;
+  }
+  if(S.s4choice==='ims3'){
+    res('neutral','IMS 3 — 開始嘗試坐於床緣','床頭抬高 >45° 耐受 ≥10 分鐘 以及肌力 ≥3',
+      '<strong>今日活動計劃（IMS 3）：</strong><ul><li>開始嘗試坐於床緣</li><li>坐姿平衡訓練</li><li>輕度自理訓練</li></ul>',STOP);
+    return;
+  }
+  if(S.s4choice==='next'){go('s5');return}
+}
+
+function chkSitEdge(){
+  if(!S.s5choice){toast('請選擇選項');return}
+  if(S.s5choice==='next'){go('s6');return}
+  if(S.s5choice==='ims46'){
+    res('neutral','IMS 4–6 — 站立期','輕度協助以下坐床緣 ≥5 分鐘，肌力 ≥4，可進行站立訓練',
+      '<strong>今日活動計劃（IMS 4–6）：</strong><ul><li>坐到站訓練</li><li>站姿平衡訓練</li><li>原地踏步練習</li></ul>',STOP);
+    return;
+  }
+  res('neutral','IMS 3 — 持續練習坐於床緣','坐床緣 <5 分鐘、需中度以上協助，或肌力 <4',
+    '<strong>今日活動計劃（IMS 3）：</strong><ul><li>持續練習坐於床緣</li><li>坐姿平衡訓練</li><li>持續肌力訓練（目標肌力 ≥4）</li></ul>',STOP);
+}
+
+function chkStepping(){
+  if(!S.s6choice){toast('請選擇選項');return}
+  if(S.s6choice==='ims46a'){
+    res('neutral','IMS 4–6 — 站立踏步期','踏步未達 ≥5 分鐘',
+      '<strong>今日活動計劃（IMS 4–6）：</strong><ul><li>坐到站訓練</li><li>站姿平衡訓練</li><li>原地踏步練習</li><li>待踏步達標且管路可移動後進階至步行</li></ul>',STOP);
+  }else if(S.s6choice==='ims46b'){
+    res('neutral','IMS 4–6 — 站立踏步期','踏步 ≥5 分鐘，但管路不可移動',
+      '<strong>今日活動計劃（IMS 4–6）：</strong><ul><li>坐到站訓練</li><li>站姿平衡訓練</li><li>原地踏步練習</li><li>待管路可移動後進階至步行</li></ul>',STOP);
+  }else{
+    res('active','IMS 7–10 — 步行訓練','踏步 ≥5 分鐘，管路可移動',
+      '<strong>今日活動計劃（IMS 7–10）：</strong><ul><li>步行耐力訓練（目標心率控制下）</li><li>生活自理訓練（ADL）</li><li>漸進增加步行距離與時間</li></ul>',STOP);
+  }
+}
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function stepLine(id){
+  var el=document.getElementById(id);
+  var title=el.querySelector('.stitle').textContent;
+  var txt;
+  if(id==='s1'||id==='s2'){
+    var ch=[].map.call(el.querySelectorAll('.oi.chk .otitle'),function(n){return n.textContent});
+    txt=ch.length?ch.join('、'):'無';
+  }else{
+    var s=el.querySelector('.oi.sel .otitle');
+    txt=s?s.textContent:'';
+  }
+  return '步驟'+id.slice(1)+' '+title+'：'+txt;
+}
+
+function buildBasis(endId){
+  var out=[];
+  for(var i=0;i<STEPS.length;i++){
+    out.push(stepLine(STEPS[i]));
+    if(STEPS[i]===endId)break;
+  }
+  return out;
+}
+
+function backToEdit(){
+  if(S.endStep)go(S.endStep);
+}
+
+function res(type,label,desc,plan,stop){
+  var act=document.querySelector('.step.active');
+  S.endStep=(act&&/^s[1-6]$/.test(act.id))?act.id:(S.endStep||'s1');
+  S.basis=buildBasis(S.endStep);
+  S.rtype=type;S.rlabel=label;S.rplan=plan;
+  if(!S.counted){S.counted=true;countUsage(label)}
+  var stopHtml=stop?'<div class="rnote">⚠️ '+stop+'</div>':'';
+  document.getElementById('result-area').innerHTML=
+    '<div class="rc '+type+'">'+
+    '<div class="rtag">今日建議</div>'+
+    '<div class="rims">'+label+'</div>'+
+    '<div class="rdesc">'+desc+'</div>'+
+    '<div style="font-size:12px;color:var(--text2);margin:6px 0 10px;padding:8px 10px;background:var(--surface);border-radius:8px;line-height:1.6"><strong style="display:block;margin-bottom:2px">判斷依據</strong>'+S.basis.map(esc).join('<br>')+'</div>'+
+    '<div class="rplan">'+plan+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-top:10px">一天進行 1–2 次活動</div>'+
+    '<div style="font-size:12px;color:var(--text3);margin-top:4px">※注意事項：仍應確認現場狀況決定是否能執行活動※</div>'+
+    stopHtml+'</div>';
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('sR').classList.add('active');
+  for(var j=0;j<6;j++){var seg=document.getElementById('ps'+j);if(seg)seg.className='ps done'}
+  window.scrollTo(0,0);
+}
+
+function saveRecord(){
+  var recs=getRecs();
+  var now=new Date();
+  recs.unshift({id:Date.now(),mrn:S.mrn,bed:S.bed,type:S.rtype,label:S.rlabel,basis:S.basis.slice(),
+    time:now.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})});
+  localStorage.setItem('ims_recs',JSON.stringify(recs));
+  toast('紀錄已儲存');
+  setTimeout(function(){showPage('records')},900);
+}
+
+function resetAll(){
+  document.getElementById('assess-flow').style.display='none';
+  document.getElementById('patient-form').style.display='block';
+  clearSel();S.mrn='';
+  document.getElementById('f-mrn').value='';
+  document.getElementById('f-bed').value='';
+  window.scrollTo(0,0);
+}
+
+function getRecs(){try{return JSON.parse(localStorage.getItem('ims_recs')||'[]')}catch(e){return[]}}
+
+function renderRecords(){
+  var recs=getRecs();
+  var el=document.getElementById('records-list');
+  if(!recs.length){
+    el.innerHTML='<div class="rempty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><div>尚無評估紀錄</div></div>';
+    return;
+  }
+  el.innerHTML=recs.map(function(r){
+    return '<div class="ri">'+
+      '<div class="rih">'+
+        '<div><div class="ripat">病歷號：'+esc(r.mrn)+'</div><div class="ritime">床號：'+esc(r.bed)+'　'+esc(r.time)+'</div></div>'+
+        '<span class="ribadge '+esc(r.type)+'">'+esc(r.label)+'</span>'+
+      '</div>'+
+      (r.basis&&r.basis.length?'<div style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px">'+r.basis.map(esc).join('<br>')+'</div>':'')+
+      '<div style="text-align:right;margin-top:8px"><button class="rib del" onclick="delRec('+r.id+')">刪除</button></div>'+
+    '</div>';
+  }).join('');
+}
+
+function delRec(id){
+  var recs=getRecs().filter(function(r){return r.id!==id});
+  localStorage.setItem('ims_recs',JSON.stringify(recs));renderRecords();
+}
+
+function clearAll(){
+  if(!confirm('確定要清除全部紀錄？'))return;
+  localStorage.removeItem('ims_recs');renderRecords();
+}
+
+function exportCSV(){
+  var recs=getRecs();
+  if(!recs.length){toast('沒有紀錄可匯出');return}
+  var rows=recs.map(function(r){
+    return[r.time,r.mrn,r.bed,r.label,(r.basis||[]).join(' / ')].map(function(v){return'"'+(v||'').replace(/"/g,'""')+'"'}).join(',');
+  });
+  var csv='\uFEFF時間,病歷號,床號,IMS建議,判斷依據\n'+rows.join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  var d=new Date();
+  a.download='IMS評估_'+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2)+'.csv';
+  a.click();toast('CSV 匯出成功');
+}
+</script>
+</body>
+</html>
